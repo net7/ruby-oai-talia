@@ -29,7 +29,8 @@ module OAI::Provider::Metadata
       else
         xml = Builder::XmlMarkup.new
         map = model.respond_to?("map_#{prefix}") ? model.send("map_#{prefix}") : {}
-          xml.tag!("#{prefix}:#{element_namespace}", header_specification) do
+        xml.tag!("#{prefix}:#{element_namespace}", header_specification) do
+          if fields.is_a?(Array)
             fields.each do |field|
               values = value_for(field, record, map)
               if values.respond_to?(:each)
@@ -40,7 +41,21 @@ module OAI::Provider::Metadata
                 xml.tag! "#{element_namespace}:#{field}", values
               end
             end
+          elsif fields.is_a?(Hash)
+            fields.each_pair do |key, field_array|
+              field_array.to_a.each do |field|
+                values = value_for(field, record, map)
+                if values.respond_to?(:each)
+                  values.each do |value|
+                    xml.tag! "#{key}:#{field}", value
+                  end
+                else
+                  xml.tag! "#{key}:#{field}", values
+                end
+              end
+            end
           end
+        end
         xml.target!
       end
     end
