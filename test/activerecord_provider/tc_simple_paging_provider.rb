@@ -4,7 +4,7 @@ class SimpleResumptionProviderTest < Test::Unit::TestCase
   include REXML
   
   def test_full_harvest
-    doc = Document.new(@provider.list_records(:metadata_prefix => 'oai_dc'))
+    doc = Document.new(@provider.list_records)
     assert_not_nil doc.elements["/OAI-PMH/resumptionToken"]
     assert_equal 25, doc.elements["/OAI-PMH/ListRecords"].to_a.size
     token = doc.elements["/OAI-PMH/resumptionToken"].text
@@ -33,8 +33,7 @@ class SimpleResumptionProviderTest < Test::Unit::TestCase
     doc = Document.new(
       @provider.list_records(
         :from => Chronic.parse("September 1 2005"),
-        :until => Chronic.parse("November 30 2005"),
-        :metadata_prefix => 'oai_dc')
+        :until => Chronic.parse("November 30 2005"))
       )
     assert_equal total/2, doc.elements["/OAI-PMH/ListRecords"].to_a.size
     assert_not_nil doc.elements["/OAI-PMH/resumptionToken"]

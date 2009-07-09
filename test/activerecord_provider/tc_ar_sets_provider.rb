@@ -10,17 +10,17 @@ class ActiveRecordSetProviderTest < Test::Unit::TestCase
   end
   
   def test_set_a
-    doc = REXML::Document.new(@provider.list_records(:set => "A", :metadata_prefix => 'oai_dc'))
+    doc = REXML::Document.new(@provider.list_records(:set => "A"))
     assert_equal 20, doc.elements['OAI-PMH/ListRecords'].to_a.size
   end
   
   def test_set_b
-    doc = REXML::Document.new(@provider.list_records(:set => "B", :metadata_prefix => 'oai_dc'))
+    doc = REXML::Document.new(@provider.list_records(:set => "B"))
     assert_equal 10, doc.elements['OAI-PMH/ListRecords'].to_a.size
   end
   
   def test_set_ab
-    doc = REXML::Document.new(@provider.list_records(:set => "A:B", :metadata_prefix => 'oai_dc'))
+    doc = REXML::Document.new(@provider.list_records(:set => "A:B"))
     assert_equal 10, doc.elements['OAI-PMH/ListRecords'].to_a.size
   end
   
