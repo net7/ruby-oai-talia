@@ -33,12 +33,12 @@ class OaiTest < Test::Unit::TestCase
   def test_from
     assert_nothing_raised { REXML::Document.new(@big_provider.list_records(:metadataPrefix => 'oai_dc')) }
     doc = REXML::Document.new(
-      @big_provider.list_records(:from => Chronic.parse("February 1 2001"), :metadataPrefix => 'oai_dc')
+      @big_provider.list_records(:from => Time.parse("February 1 2001"), :metadataPrefix => 'oai_dc')
       )
     assert_equal 100, doc.elements['OAI-PMH/ListRecords'].to_a.size
 
     doc = REXML::Document.new(
-      @big_provider.list_records(:from => Chronic.parse("January 1 2001"), :metadataPrefix => 'oai_dc')
+      @big_provider.list_records(:from => Time.parse("January 1 2001"), :metadataPrefix => 'oai_dc')
       )
     assert_equal 200, doc.elements['OAI-PMH/ListRecords'].to_a.size
   end
@@ -46,7 +46,7 @@ class OaiTest < Test::Unit::TestCase
   def test_until
     assert_nothing_raised { REXML::Document.new(@big_provider.list_records(:metadataPrefix => 'oai_dc')) }
     doc = REXML::Document.new(
-      @big_provider.list_records(:until => Chronic.parse("November 1 2000"), :metadataPrefix => 'oai_dc')
+      @big_provider.list_records(:until => Time.parse("November 1 2000"), :metadataPrefix => 'oai_dc')
       )
     assert_equal 100, doc.elements['OAI-PMH/ListRecords'].to_a.size
   end
@@ -54,15 +54,15 @@ class OaiTest < Test::Unit::TestCase
   def test_from_and_until
     assert_nothing_raised { REXML::Document.new(@big_provider.list_records(:metadataPrefix => 'oai_dc')) }
     doc = REXML::Document.new(
-      @big_provider.list_records(:from => Chronic.parse("November 1 2000"),
-        :until => Chronic.parse("November 30 2000"),
+      @big_provider.list_records(:from => Time.parse("November 1 2000"),
+        :until => Time.parse("November 30 2000"),
         :metadataPrefix => 'oai_dc')
       )
     assert_equal 100, doc.elements['OAI-PMH/ListRecords'].to_a.size
 
     doc = REXML::Document.new(
-      @big_provider.list_records(:from => Chronic.parse("December 1 2000"),
-      :until => Chronic.parse("December 31 2000"),
+      @big_provider.list_records(:from => Time.parse("December 1 2000"),
+      :until => Time.parse("December 31 2000"),
       :metadataPrefix => 'oai_dc')
       )
     assert_equal 100, doc.elements['OAI-PMH/ListRecords'].to_a.size

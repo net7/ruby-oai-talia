@@ -1,3 +1,5 @@
+require 'singleton'
+
 module OAI::Provider::Metadata
   # == Metadata Base Class
   #
@@ -52,13 +54,14 @@ module OAI::Provider::Metadata
     # 2.  Try calling the pluralized name method on the model.
     # 3.  Try calling the singular name method on the model
     def value_for(field, record, map)
-      method = map[field] ? map[field].to_s : field.to_s
-      
-      methods = record.public_methods(false)
-      if methods.include?(method.pluralize)
-        record.send method.pluralize
-      elsif methods.include?(method)
-        record.send method
+      method = map[field] ? map[field].to_s : field.to_s 
+     
+      if record.respond_to?(pluralize(method))
+        record.send pluralize(method)
+      elsif record.respond_to?(method)
+        # at this point, this function will throw a dep. error because of the call to type -- a reserved work
+        # in ruby
+        silence_warnings { record.send method }
       else
         []
       end
@@ -68,6 +71,55 @@ module OAI::Provider::Metadata
     def header_specification
       raise NotImplementedError.new
     end
+    
+    # Shamelessly lifted form ActiveSupport.  Thanks Rails community!
+    def pluralize(word)
+      # Use ActiveSupports pluralization if it's available.
+      return word.pluralize if word.respond_to?(:pluralize)
+      
+      # Otherwise use our own simple pluralization rules.
+      result = word.to_s.dup
+      
+      # Uncountable words
+      return result if %w(equipment information rice money species series fish sheep).include?(result)
+      
+      # Irregular words
+      { 'person' => 'people', 'man' => 'men', 'child' => 'children', 'sex' => 'sexes', 
+        'move' => 'moves', 'cow' => 'kine' }.each { |k,v| return v if word == k }
+      
+      rules.each { |(rule, replacement)| break if result.gsub!(rule, replacement) }
+      result
+    end
+    
+    def rules
+      [
+        [/$/, 's'],
+        [/s$/i, 's'],
+        [/(ax|test)is$/i, '\1es'],
+        [/(octop|vir)us$/i, '\1i'],
+        [/(alias|status)$/i, '\1es'],
+        [/(bu)s$/i, '\1ses'],
+        [/(buffal|tomat)o$/i, '\1oes'],
+        [/([ti])um$/i, '\1a'],
+        [/sis$/i, 'ses'],
+        [/(?:([^f])fe|([lr])f)$/i, '\1\2ves'],
+        [/(hive)$/i, '\1s'],
+        [/([^aeiouy]|qu)y$/i, '\1ies'],
+        [/(x|ch|ss|sh)$/i, '\1es'],
+        [/(matr|vert|ind)(?:ix|ex)$/i, '\1ices'],
+        [/([m|l])ouse$/i, '\1ice'],
+        [/^(ox)$/i, '\1en'],
+        [/(quiz)$/i, '\1zes']
+      ]
+    end
+    
+    def silence_warnings
+      old_verbose, $VERBOSE = $VERBOSE, nil
+      yield
+    ensure
+      $VERBOSE = old_verbose
+    end
+    
 
   end
   

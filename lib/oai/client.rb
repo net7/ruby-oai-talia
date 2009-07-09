@@ -32,8 +32,9 @@ module OAI
   #
   #   client = OAI::Client.new 'http://www.pubmedcentral.gov/oai/oai.cgi'
   #   record = client.get_record :identifier => 'oai:pubmedcentral.gov:13901'
-  #   for identifier in client.list_identifiers :metadata_prefix => 'oai_dc'
-  #     puts identifier.
+  #   for identifier in client.list_identifiers
+  #     puts identifier
+  #   end
   #
   # It is worth noting that the api uses methods and parameter names with 
   # underscores in them rather than studly caps. So above list_identifiers 
@@ -155,7 +156,7 @@ module OAI
     def do_request(verb, opts = nil)
       # fire off the request and return appropriate DOM object
       uri = build_uri(verb, opts)
-      xml = get(uri)
+      xml = strip_invalid_utf_8_chars(get(uri))
       if @parser == 'libxml' 
         # remove default namespace for oai-pmh since libxml
         # isn't able to use our xpaths to get at them 
@@ -176,15 +177,16 @@ module OAI
     
     def encode(value)
       return CGI.escape(value) unless value.respond_to?(:strftime)
-      if value.respond_to?(:to_time) # Usually a DateTime or Time
-        value.to_time.utc.xmlschema
+      if value.kind_of?(DateTime)
+        Time.parse(value.asctime).utc.xmlschema
+      elsif value.kind_of?(Time)
+        value.utc.xmlschema
       else # Assume something date like
         value.strftime('%Y-%m-%d')
       end
     end
 
     def load_document(xml)
-      retried = false
       case @parser
       when 'libxml'
         begin
@@ -192,28 +194,13 @@ module OAI
           parser.string = xml
           return parser.parse
         rescue XML::Parser::ParseError => e
-          if retried
-            raise OAI::Exception, 'response not well formed XML: '+e, caller
-          end
-          ic = Iconv.new('UTF-8//IGNORE', 'UTF-8')
-          xml2 = ic.iconv(xml << ' ')[0..-2]
-          puts "equal? #{xml == xml2}"
-          retried = true
-          retry
+          raise OAI::Exception, 'response not well formed XML: '+e, caller
         end
       when 'rexml'
         begin
           return REXML::Document.new(xml)
         rescue REXML::ParseException => e
-          if retried
-            puts xml
-            raise OAI::Exception, 'response not well formed XML: '+e, caller
-          end
-          puts "RETRYING"
-          ic = Iconv.new('UTF-8//IGNORE', 'UTF-8')
-          xml = ic.iconv(xml << ' ')[0..-2]
-          retried = true
-          retry
+          raise OAI::Exception, 'response not well formed XML: '+e.message, caller
         end
       end
     end
@@ -288,13 +275,27 @@ module OAI
     def parse_date(value)
       return value if value.respond_to?(:strftime)
       
-      # Oddly Chronic doesn't parse an UTC encoded datetime.  
-      # Luckily Time does
-      dt = Chronic.parse(value) || Time.parse(value)
-      raise OAI::ArgumentError.new unless dt
-      
-      dt.utc
+      Date.parse(value) # This will raise an exception for badly formatted dates
+      Time.parse(value).utc # Sadly, this will not
+    rescue
+      raise OAI::ArgumentError.new 
     end
     
+    # Strip out invalid UTF-8 characters.  Regex from the W3C, inverted.
+    # http://www.w3.org/International/questions/qa-forms-utf-8.en.php
+    #
+    # Regex is from WebCollab: 
+    #   http://webcollab.sourceforge.net/unicode.html
+    def strip_invalid_utf_8_chars(xml)
+      simple_bytes = xml.gsub(/[\x00-\x08\x10\x0B\x0C\x0E-\x19\x7F]
+                             | [\x00-\x7F][\x80-\xBF]+
+                             | ([\xC0\xC1]|[\xF0-\xFF])[\x80-\xBF]*
+                             | [\xC2-\xDF]((?![\x80-\xBF])|[\x80-\xBF]{2,})
+                             | [\xE0-\xEF](([\x80-\xBF](?![\x80-\xBF]))
+                             | (?![\x80-\xBF]{2})|[\x80-\xBF]{3,})/x, '?')
+      simple_bytes.gsub(/\xE0[\x80-\x9F][\x80-\xBF]
+                       | \xED[\xA0-\xBF][\x80-\xBF]/,'?')
+    end
+        
   end
 end

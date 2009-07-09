@@ -15,9 +15,18 @@ module OAI
         when 'REXML::Element'
           message = error.text
           code = error.attributes['code']
-        when 'XML::Node'
+        when 'LibXML::XML::Node'
           message = error.content
-          code = error.property('code')
+          code = ""
+          if defined?(error.property) == nil
+              code = error.attributes['code']
+           else
+	      begin
+	 	code = error["code"]
+	      rescue
+                code = error.property('code')
+	      end
+           end
       end
       raise OAI::Exception.new(message, code)
     end

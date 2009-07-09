@@ -1,5 +1,4 @@
 require 'builder' unless defined?(Builder)
-
 module OAI
   module Provider
     module Response
@@ -9,7 +8,6 @@ module OAI
     
     class << self
       attr_reader :valid_options, :default_options, :required_options
-
       def valid_parameters(*args)
         @valid_options ||= []
         @valid_options = (@valid_options + args.dup).uniq
@@ -27,24 +25,24 @@ module OAI
       end
       
     end 
-
     def initialize(provider, options = {})
       @provider = provider
       @original_options = options.dup
       @options = internalize(options)
       raise OAI::ArgumentException.new unless valid?
     end
-
     def response
       @builder = Builder::XmlMarkup.new
       @builder.instruct! :xml, :version=>"1.0", :encoding=>"UTF-8"
       @builder.tag!('OAI-PMH', header) do 
         @builder.responseDate Time.now.utc.xmlschema
-        @builder.request(provider.url, options)
+        #options parameter has been removed here because with it
+        #the data won't validate against oai validators.  Without, it 
+        #validates.  
+        @builder.request(provider.url) #-- OAI 2.0 Hack - removed request options 
         yield @builder
       end
     end
-
     private
     
     def header
@@ -55,7 +53,6 @@ module OAI
           http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd}
       }
     end
-
     def extract_identifier(id)
       id.sub("#{provider.prefix}/", '')
     end
@@ -64,7 +61,7 @@ module OAI
       return true if resumption?
       
       return true if self.class.valid_options.nil? and options.empty?
-
+      
       if self.class.required_options
         return false unless (self.class.required_options - @options.keys).empty?
       end
@@ -74,7 +71,7 @@ module OAI
       return false unless valid_times?
       return false unless valid_format?
       populate_defaults
-
+      true
     end
     
     def valid_format?
@@ -133,12 +130,10 @@ module OAI
     def parse_date(value)
       return value if value.respond_to?(:strftime)
       
-      # Oddly Chronic doesn't parse an UTC encoded datetime.  
-      # Luckily Time does
-      dt = Chronic.parse(value) || Time.parse(value)
-      raise OAI::ArgumentError.new unless dt
-      
-      dt.utc
+      Date.parse(value) # This will raise an exception for badly formatted dates
+      Time.parse(value).utc #  -- UTC Bug fix hack 8/08 not in core
+    rescue
+      raise OAI::ArgumentException.new 
     end
     
     def internalize(hash = {})
@@ -160,3 +155,4 @@ module OAI
 end
 end
 end
+

@@ -8,10 +8,12 @@ module OAI::Provider::Response
           r.repositoryName provider.name
           r.baseURL provider.url
           r.protocolVersion 2.0
-          provider.email.each do |address|
-            r.adminEmail address
-          end if provider.email
-          r.earliestDatestamp provider.model.earliest
+          if provider.email and provider.email.respond_to?(:each)
+            provider.email.each { |address| r.adminEmail address }
+          else
+            r.adminEmail provider.email.to_s
+          end
+          r.earliestDatestamp Time.parse(provider.model.earliest.to_s).utc.xmlschema
           r.deletedRecord provider.delete_support.to_s
           r.granularity provider.granularity
         end
@@ -21,4 +23,3 @@ module OAI::Provider::Response
   end
   
 end
-  
