@@ -30,34 +30,66 @@ class ProviderExceptions < Test::Unit::TestCase
   
   def test_bad_format_raises_exception
     assert_raise(OAI::FormatException) do
-      @provider.get_record(:identifier => 'oai:test/1', :metadata_prefix => 'html')
+      @provider.get_record(:identifier => 'oai:test/1', :metadataPrefix => 'html')
+    end
+    assert_raise(OAI::FormatException) do
+      @provider.list_identifiers(:metadataPrefix => 'fjdsklfj')
     end
   end
   
   def test_bad_id_raises_exception
     assert_raise(OAI::IdException) do
-      @provider.get_record(:identifier => 'oai:test/5000')
+      @provider.get_record(:identifier => 'oai:test/5000', :metadataPrefix => 'oai_dc')
     end
     assert_raise(OAI::IdException) do
-      @provider.get_record(:identifier => 'oai:test/-1')
+      @provider.get_record(:identifier => 'oai:test/-1', :metadataPrefix => 'oai_dc')
     end
     assert_raise(OAI::IdException) do
-      @provider.get_record(:identifier => 'oai:test/one')
+      @provider.get_record(:identifier => 'oai:test/one', :metadataPrefix => 'oai_dc')
     end
     assert_raise(OAI::IdException) do
-      @provider.get_record(:identifier => 'oai:test/\\$1\1!')
+      @provider.get_record(:identifier => 'oai:test/\\$1\1!', :metadataPrefix => 'oai_dc')
     end
   end
   
   def test_no_records_match_dates_that_are_out_of_range
     assert_raise(OAI::NoMatchException) do
       @provider.list_records(:from => Chronic.parse("November 2 2000"), 
-                             :until => Chronic.parse("November 1 2000"))
+                             :until => Chronic.parse("November 1 2000"),
+                             :metadataPrefix => 'oai_dc')
+    end
+  end
+  
+  def test_bad_datespecs_raise_exception
+    assert_raise(OAI::ArgumentException) do
+      @provider.list_records( :from => "iamnotadate",
+                              :until => "2005-06-05T12:20:40Z",
+                              :metadataPrefix => 'oai_dc' )
+    end
+    assert_raise(OAI::ArgumentException) do
+      @provider.list_records( :from => "2005-06-05T12:20:40Z",
+                              :until => "iamnotadate",
+                              :metadataPrefix => 'oai_dc' )
+    end    
+  end
+  
+  def test_extra_parameter_for_identify_raises_correct_exception
+    assert_raise(OAI::ArgumentException) do
+      @provider.identify( :metadataPrefix => 'oai_dc' )
+    end
+  end
+  
+  def test_different_granularities_raises_exception
+    assert_raise(OAI::ArgumentException) do
+      @provider.list_records( :from => "2000-01-01", 
+                              :until => "2007-06-05T12:00:00Z",
+                              :metadataPrefix => 'oai_dc'
+                              )
     end
   end
   
   def test_no_records_match_bad_set
-    assert_raise(OAI::NoMatchException) { @provider.list_records(:set => 'unknown') }
+    assert_raise(OAI::NoMatchException) { @provider.list_records(:set => 'unknown', :metadataPrefix => 'oai_dc') }
   end
   
 end
