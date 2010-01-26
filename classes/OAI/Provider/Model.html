@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: OAI::Provider::Model</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">OAI::Provider::Model</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../../files/lib/oai/provider/model_rb.html">
+                lib/oai/provider/model.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                Object
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <h1><a href="Model.html">OAI::Provider::Model</a></h1>
+<p>
+<a href="Model.html">Model</a> implementers should subclass <a
+href="Model.html">OAI::Provider::Model</a> and override <a
+href="Model.html#M000041">Model#earliest</a>, <a
+href="Model.html#M000042">Model#latest</a>, and <a
+href="Model.html#M000044">Model#find</a>. Optionally <a
+href="Model.html#M000043">Model#sets</a> and Model#deleted? can be used to
+support <a href="Model.html#M000043">sets</a> and record deletions. It is
+also the responsibility of the model implementer to account for resumption
+tokens if support is required. Models that don&#8216;t support resumption
+tokens should raise an exception if a limit is requested during
+initialization.
+</p>
+<p>
+<a href="Model.html#M000041">earliest</a> - should return the <a
+href="Model.html#M000041">earliest</a> update time in the repository. <a
+href="Model.html#M000042">latest</a> - should return the most recent update
+time in the repository. <a href="Model.html#M000043">sets</a> - should
+return an array of <a href="Model.html#M000043">sets</a> supported by the
+repository. <a href="Model.html#M000045">deleted?</a> - individual records
+returned should respond true or false when sent the <a
+href="Model.html#M000045">deleted?</a> message. available_formats - if
+overridden, individual records should return an array of prefixes for all
+formats in which that record is available, if other than
+[&quot;oai_dc&quot;]
+</p>
+<h2>Resumption Tokens</h2>
+<p>
+For examples of using resumption tokens see the <a
+href="ActiveRecordWrapper.html">ActiveRecordWrapper</a>, and <a
+href="ActiveRecordCachingWrapper.html">ActiveRecordCachingWrapper</a>
+classes.
+</p>
+<p>
+There are several helper models for dealing with resumption tokens please
+see the <a href="ResumptionToken.html">ResumptionToken</a> class for more
+details.
+</p>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000045">deleted?</a>&nbsp;&nbsp;
+      <a href="#M000041">earliest</a>&nbsp;&nbsp;
+      <a href="#M000044">find</a>&nbsp;&nbsp;
+      <a href="#M000042">latest</a>&nbsp;&nbsp;
+      <a href="#M000040">new</a>&nbsp;&nbsp;
+      <a href="#M000043">sets</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+    <div id="attribute-list">
+      <h3 class="section-bar">Attributes</h3>
+
+      <div class="name-list">
+        <table>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">timestamp_field</td>
+          <td class="context-item-value">&nbsp;[R]&nbsp;</td>
+          <td class="context-item-desc"></td>
+        </tr>
+        </table>
+      </div>
+    </div>
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000040" class="method-detail">
+        <a name="M000040"></a>
+
+        <div class="method-heading">
+          <a href="#M000040" class="method-signature">
+          <span class="method-name">new</span><span class="method-args">(limit = nil, timestamp_field = 'updated_at')</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000040-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000040-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/oai/provider/model.rb, line 33</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">limit</span> = <span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">timestamp_field</span> = <span class="ruby-value str">'updated_at'</span>)
+      <span class="ruby-ivar">@limit</span> = <span class="ruby-identifier">limit</span>
+      <span class="ruby-ivar">@timestamp_field</span> = <span class="ruby-identifier">timestamp_field</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000045" class="method-detail">
+        <a name="M000045"></a>
+
+        <div class="method-heading">
+          <a href="#M000045" class="method-signature">
+          <span class="method-name">deleted?</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000045-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000045-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/oai/provider/model.rb, line 68</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">deleted?</span>
+      <span class="ruby-keyword kw">false</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000041" class="method-detail">
+        <a name="M000041"></a>
+
+        <div class="method-heading">
+          <a href="#M000041" class="method-signature">
+          <span class="method-name">earliest</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+should return the <a href="Model.html#M000041">earliest</a> timestamp
+available from this model.
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000041-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000041-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/oai/provider/model.rb, line 39</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">earliest</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">NotImplementedError</span>.<span class="ruby-identifier">new</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000044" class="method-detail">
+        <a name="M000044"></a>
+
+        <div class="method-heading">
+          <a href="#M000044" class="method-signature">
+          <span class="method-name">find</span><span class="method-args">(selector, options={})</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+<a href="Model.html#M000044">find</a> is the core method of a model, it
+returns records from the model bases on the parameters passed in.
+</p>
+<p>
+<tt>selector</tt> can be a singular id, or the symbol :all <tt>options</tt>
+is a hash of options to be used to constrain the query.
+</p>
+<p>
+Valid options:
+</p>
+<ul>
+<li>:from =&gt; <a href="Model.html#M000041">earliest</a> timestamp to be
+included in the results
+
+</li>
+<li>:until =&gt; <a href="Model.html#M000042">latest</a> timestamp to be
+included in the results
+
+</li>
+<li>:set =&gt; the set from which to retrieve the results
+
+</li>
+<li>:metadata_prefix =&gt; type of metadata requested (this may be useful if
+
+<pre>
+                    not all records are available in all formats)
+</pre>
+</li>
+</ul>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000044-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000044-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/oai/provider/model.rb, line 64</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">find</span>(<span class="ruby-identifier">selector</span>, <span class="ruby-identifier">options</span>={})
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">NotImplementedError</span>.<span class="ruby-identifier">new</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000042" class="method-detail">
+        <a name="M000042"></a>
+
+        <div class="method-heading">
+          <a href="#M000042" class="method-signature">
+          <span class="method-name">latest</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+should return the <a href="Model.html#M000042">latest</a> timestamp
+available from this model.
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000042-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000042-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/oai/provider/model.rb, line 44</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">latest</span>
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">NotImplementedError</span>.<span class="ruby-identifier">new</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000043" class="method-detail">
+        <a name="M000043"></a>
+
+        <div class="method-heading">
+          <a href="#M000043" class="method-signature">
+          <span class="method-name">sets</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000043-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000043-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/oai/provider/model.rb, line 48</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">sets</span>
+      <span class="ruby-keyword kw">nil</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

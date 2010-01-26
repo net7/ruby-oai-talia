@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: OAI::Provider::ActiveRecordCachingWrapper</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">OAI::Provider::ActiveRecordCachingWrapper</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../../files/lib/oai/provider/model/activerecord_caching_wrapper_rb.html">
+                lib/oai/provider/model/activerecord_caching_wrapper.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                <a href="ActiveRecordWrapper.html">
+                ActiveRecordWrapper
+               </a>
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <h1><a href="ActiveRecordCachingWrapper.html">OAI::Provider::ActiveRecordCachingWrapper</a></h1>
+<p>
+This class wraps an ActiveRecord model and delegates all of the record
+selection/retrieval to the AR model. It accepts options for specifying the
+update timestamp field, a timeout, and a limit. The limit option is used
+for doing pagination with resumption tokens. The timeout is used to expire
+old tokens from the cache. Default timeout is 12 hours.
+</p>
+<p>
+The difference between <a
+href="ActiveRecordWrapper.html">ActiveRecordWrapper</a> and this class is
+how the pagination is accomplished. <a
+href="ActiveRecordWrapper.html">ActiveRecordWrapper</a> encodes all the
+information in the token. That approach should work 99% of the time. If you
+have an extremely active respository you may want to consider the caching
+wrapper. The caching wrapper takes the entire result set from a request and
+caches it in another database table, well tables actually. So the result
+returned to the client will always be internally consistent.
+</p>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000047">find</a>&nbsp;&nbsp;
+      <a href="#M000051">hydrate_records</a>&nbsp;&nbsp;
+      <a href="#M000046">new</a>&nbsp;&nbsp;
+      <a href="#M000048">next_set</a>&nbsp;&nbsp;
+      <a href="#M000049">select_partial</a>&nbsp;&nbsp;
+      <a href="#M000050">sweep_cache</a>&nbsp;&nbsp;
+      <a href="#M000052">token_conditions</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+    <div id="attribute-list">
+      <h3 class="section-bar">Attributes</h3>
+
+      <div class="name-list">
+        <table>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">expire</td>
+          <td class="context-item-value">&nbsp;[R]&nbsp;</td>
+          <td class="context-item-desc"></td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">model</td>
+          <td class="context-item-value">&nbsp;[R]&nbsp;</td>
+          <td class="context-item-desc"></td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">timestamp_field</td>
+          <td class="context-item-value">&nbsp;[R]&nbsp;</td>
+          <td class="context-item-desc"></td>
+        </tr>
+        </table>
+      </div>
+    </div>
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000046" class="method-detail">
+        <a name="M000046"></a>
+
+        <div class="method-heading">
+          <a href="#M000046" class="method-signature">
+          <span class="method-name">new</span><span class="method-args">(model, options={})</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000046-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000046-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/oai/provider/model/activerecord_caching_wrapper.rb, line 53</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">options</span>={})
+      <span class="ruby-ivar">@expire</span> = <span class="ruby-identifier">options</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:timeout</span>) <span class="ruby-operator">||</span> <span class="ruby-value">12</span>.<span class="ruby-identifier">hours</span>
+      <span class="ruby-keyword kw">super</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">options</span>)
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000047" class="method-detail">
+        <a name="M000047"></a>
+
+        <div class="method-heading">
+          <a href="#M000047" class="method-signature">
+          <span class="method-name">find</span><span class="method-args">(selector, options={})</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000047-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000047-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/oai/provider/model/activerecord_caching_wrapper.rb, line 58</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">find</span>(<span class="ruby-identifier">selector</span>, <span class="ruby-identifier">options</span>={})
+      <span class="ruby-identifier">sweep_cache</span>
+      <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">next_set</span>(<span class="ruby-identifier">options</span>[<span class="ruby-identifier">:resumption_token</span>]) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:resumption_token</span>]
+
+      <span class="ruby-identifier">conditions</span> = <span class="ruby-identifier">sql_conditions</span>(<span class="ruby-identifier">options</span>)
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">:all</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">selector</span>
+        <span class="ruby-identifier">total</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">count</span>(<span class="ruby-identifier">:id</span>, <span class="ruby-identifier">:conditions</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">conditions</span>)
+        <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@limit</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">total</span> <span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@limit</span>
+          <span class="ruby-identifier">select_partial</span>(
+            <span class="ruby-constant">ResumptionToken</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">options</span>.<span class="ruby-identifier">merge</span>({<span class="ruby-identifier">:last</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>})))
+        <span class="ruby-keyword kw">else</span>
+          <span class="ruby-identifier">model</span>.<span class="ruby-identifier">find</span>(<span class="ruby-identifier">:all</span>, <span class="ruby-identifier">:conditions</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">conditions</span>)
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">else</span>
+        <span class="ruby-identifier">model</span>.<span class="ruby-identifier">find</span>(<span class="ruby-identifier">selector</span>, <span class="ruby-identifier">:conditions</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">conditions</span>)
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Protected Instance methods</h3>
+
+      <div id="method-M000051" class="method-detail">
+        <a name="M000051"></a>
+
+        <div class="method-heading">
+          <a href="#M000051" class="method-signature">
+          <span class="method-name">hydrate_records</span><span class="method-args">(records)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000051-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000051-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/oai/provider/model/activerecord_caching_wrapper.rb, line 118</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">hydrate_records</span>(<span class="ruby-identifier">records</span>)
+      <span class="ruby-identifier">model</span>.<span class="ruby-identifier">find</span>(<span class="ruby-identifier">records</span>.<span class="ruby-identifier">collect</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">record_id</span> })
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000048" class="method-detail">
+        <a name="M000048"></a>
+
+        <div class="method-heading">
+          <a href="#M000048" class="method-signature">
+          <span class="method-name">next_set</span><span class="method-args">(token_string)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000048-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000048-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/oai/provider/model/activerecord_caching_wrapper.rb, line 79</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">next_set</span>(<span class="ruby-identifier">token_string</span>)
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">ResumptionTokenException</span>.<span class="ruby-identifier">new</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@limit</span>
+
+      <span class="ruby-identifier">token</span> = <span class="ruby-constant">ResumptionToken</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">token_string</span>)
+      <span class="ruby-identifier">total</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">count</span>(<span class="ruby-identifier">:id</span>, <span class="ruby-identifier">:conditions</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">token_conditions</span>(<span class="ruby-identifier">token</span>))
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">token</span>.<span class="ruby-identifier">last</span> <span class="ruby-operator">*</span> <span class="ruby-ivar">@limit</span> <span class="ruby-operator">+</span> <span class="ruby-ivar">@limit</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">total</span>
+        <span class="ruby-identifier">select_partial</span>(<span class="ruby-identifier">token</span>)
+      <span class="ruby-keyword kw">else</span> 
+        <span class="ruby-identifier">select_partial</span>(<span class="ruby-identifier">token</span>).<span class="ruby-identifier">records</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000049" class="method-detail">
+        <a name="M000049"></a>
+
+        <div class="method-heading">
+          <a href="#M000049" class="method-signature">
+          <span class="method-name">select_partial</span><span class="method-args">(token)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+select a subset of the result set, and return it with a resumption token to
+get the next subset
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000049-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000049-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/oai/provider/model/activerecord_caching_wrapper.rb, line 94</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">select_partial</span>(<span class="ruby-identifier">token</span>)
+      <span class="ruby-keyword kw">if</span> <span class="ruby-value">0</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">token</span>.<span class="ruby-identifier">last</span>
+        <span class="ruby-identifier">oaitoken</span> = <span class="ruby-constant">OaiToken</span>.<span class="ruby-identifier">find_or_create_by_token</span>(<span class="ruby-identifier">token</span>.<span class="ruby-identifier">to_s</span>)
+        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">oaitoken</span>.<span class="ruby-identifier">new_record_before_save?</span>
+          <span class="ruby-constant">OaiToken</span>.<span class="ruby-identifier">connection</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-value str">&quot;insert into &quot;</span> <span class="ruby-operator">+</span>
+            <span class="ruby-node">&quot;#{OaiEntry.table_name} (oai_token_id, record_id) &quot;</span> <span class="ruby-operator">+</span>
+            <span class="ruby-node">&quot;select #{oaitoken.id}, id from #{model.table_name} where &quot;</span> <span class="ruby-operator">+</span>
+            <span class="ruby-node">&quot;#{OaiToken.sanitize_sql(token_conditions(token))}&quot;</span>)
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+      
+      <span class="ruby-identifier">oaitoken</span> = <span class="ruby-constant">OaiToken</span>.<span class="ruby-identifier">find_by_token</span>(<span class="ruby-identifier">token</span>.<span class="ruby-identifier">to_s</span>)
+      <span class="ruby-identifier">raise</span> <span class="ruby-constant">ResumptionTokenException</span>.<span class="ruby-identifier">new</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">oaitoken</span>
+
+      <span class="ruby-constant">PartialResult</span>.<span class="ruby-identifier">new</span>(
+        <span class="ruby-identifier">hydrate_records</span>(<span class="ruby-identifier">oaitoken</span>.<span class="ruby-identifier">entries</span>.<span class="ruby-identifier">find</span>(<span class="ruby-identifier">:all</span>, <span class="ruby-identifier">:limit</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@limit</span>, 
+          <span class="ruby-identifier">:offset</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">token</span>.<span class="ruby-identifier">last</span> <span class="ruby-operator">*</span> <span class="ruby-ivar">@limit</span>)), <span class="ruby-identifier">token</span>.<span class="ruby-identifier">next</span>(<span class="ruby-identifier">token</span>.<span class="ruby-identifier">last</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>)
+      )
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000050" class="method-detail">
+        <a name="M000050"></a>
+
+        <div class="method-heading">
+          <a href="#M000050" class="method-signature">
+          <span class="method-name">sweep_cache</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000050-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000050-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/oai/provider/model/activerecord_caching_wrapper.rb, line 114</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">sweep_cache</span>
+      <span class="ruby-constant">OaiToken</span>.<span class="ruby-identifier">destroy_all</span>([<span class="ruby-value str">&quot;created_at &lt; ?&quot;</span>, <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">expire</span>])
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000052" class="method-detail">
+        <a name="M000052"></a>
+
+        <div class="method-heading">
+          <a href="#M000052" class="method-signature">
+          <span class="method-name">token_conditions</span><span class="method-args">(token)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000052-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000052-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/oai/provider/model/activerecord_caching_wrapper.rb, line 122</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">token_conditions</span>(<span class="ruby-identifier">token</span>)
+      <span class="ruby-identifier">sql_conditions</span> <span class="ruby-identifier">token</span>.<span class="ruby-identifier">to_conditions_hash</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

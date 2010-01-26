@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Module: OAI::Provider</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Module</strong></td>
+          <td class="class-name-in-header">OAI::Provider</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/lib/oai/provider/model/activerecord_caching_wrapper_rb.html">
+                lib/oai/provider/model/activerecord_caching_wrapper.rb
+                </a>
+        <br />
+                <a href="../../files/lib/oai/provider/model/activerecord_wrapper_rb.html">
+                lib/oai/provider/model/activerecord_wrapper.rb
+                </a>
+        <br />
+                <a href="../../files/lib/oai/provider/model_rb.html">
+                lib/oai/provider/model.rb
+                </a>
+        <br />
+                <a href="../../files/lib/oai/provider/partial_result_rb.html">
+                lib/oai/provider/partial_result.rb
+                </a>
+        <br />
+                <a href="../../files/lib/oai/provider/response_rb.html">
+                lib/oai/provider/response.rb
+                </a>
+        <br />
+                <a href="../../files/lib/oai/provider/resumption_token_rb.html">
+                lib/oai/provider/resumption_token.rb
+                </a>
+        <br />
+                <a href="../../files/lib/oai/provider_rb.html">
+                lib/oai/provider.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <h1><a href="Provider.html">OAI::Provider</a></h1>
+<p>
+Open Archives Initiative - Protocol for <a
+href="Provider/Metadata.html">Metadata</a> Harvesting see <a
+href="http://www.openarchives.org">www.openarchives.org</a>/
+</p>
+<h2>Features</h2>
+<ul>
+<li>Easily setup a simple repository
+
+</li>
+<li>Simple integration with ActiveRecord
+
+</li>
+<li>Dublin Core metadata format included
+
+</li>
+<li>Easily add addition metadata formats
+
+</li>
+<li>Adaptable to any data source
+
+</li>
+<li>Simple resumption token support
+
+</li>
+</ul>
+<h2>Usage</h2>
+<p>
+To create a functional provider either subclass <a
+href="Provider/Base.html">Provider::Base</a>, or reconfigure the defaults.
+</p>
+<h3>Sub classing a provider</h3>
+<pre>
+ class MyProvider &lt; Oai::Provider
+   repository_name 'My little OAI provider'
+   repository_url  'http://localhost/provider'
+   record_prefix 'oai:localhost'
+   admin_email 'root@localhost'   # String or Array
+   source_model MyModel.new       # Subclass of OAI::Provider::Model
+ end
+</pre>
+<h3>Configuring the default provider</h3>
+<pre>
+ class Oai::Provider::Base
+   repository_name 'My little OAI Provider'
+   repository_url 'http://localhost/provider'
+   record_prefix 'oai:localhost'
+   admin_email 'root@localhost'
+   source_model MyModel.new
+ end
+</pre>
+<p>
+The provider does allow a URL to be passed in at request processing time in
+case the repository URL cannot be determined ahead of time.
+</p>
+<h2>Integrating with frameworks</h2>
+<h3>Camping</h3>
+<p>
+In the Models module of your camping application post model definition:
+</p>
+<pre>
+  class CampingProvider &lt; OAI::Provider::Base
+    repository_name 'Camping Test OAI Repository'
+    source_model ActiveRecordWrapper.new(YOUR_ACTIVE_RECORD_MODEL)
+  end
+</pre>
+<p>
+In the Controllers module:
+</p>
+<pre>
+  class Oai
+    def get
+      @headers['Content-Type'] = 'text/xml'
+      provider = Models::CampingProvider.new
+      provider.process_request(@input.merge(:url =&gt; &quot;http:&quot;+URL(Oai).to_s))
+    end
+  end
+</pre>
+<p>
+The provider will be available at &quot;/oai&quot;
+</p>
+<h3>Rails</h3>
+<p>
+At the bottom of environment.rb create a <a href="../OAI.html">OAI</a> <a
+href="Provider.html">Provider</a>:
+</p>
+<pre>
+  # forgive the standard blog example.
+
+  require 'oai'
+  class BlogProvider &lt; OAI::Provider::Base
+    repository_name 'My little OAI Provider'
+    repository_url 'http://localhost:3000/provider'
+    record_prefix 'oai:blog'
+    admin_email 'root@localhost'
+    source_model OAI::Provider::ActiveRecordWrapper.new(Post)
+  end
+</pre>
+<p>
+Create a custom controller:
+</p>
+<pre>
+  class OaiController &lt; ApplicationController
+    def index
+      # Remove controller and action from the options.  Rails adds them automatically.
+      options = params.delete_if { |k,v| %w{controller action}.include?(k) }
+      provider = BlogProvider.new
+      response =  provider.process_request(options)
+      render :text =&gt; response, :content_type =&gt; 'text/xml'
+    end
+  end
+</pre>
+<p>
+Special thanks to Jose Hales-Garcia for this solution.
+</p>
+<h2>Supporting custom metadata formats</h2>
+<p>
+See Oai::Metadata for details.
+</p>
+<h2>ActiveRecord Integration</h2>
+<p>
+ActiveRecord integration is provided by the <a
+href="Provider/ActiveRecordWrapper.html">ActiveRecordWrapper</a> class. It
+takes one required paramater, the class name of the AR class to wrap, and
+optional hash of options.
+</p>
+<p>
+Valid options include:
+</p>
+<ul>
+<li>timestamp_field - Specifies the model field to use as the update filter.
+Defaults to &#8216;updated_at&#8217;.
+
+</li>
+<li>limit - Maximum number of records to return in each page/set. Defaults to
+100. The wrapper will paginate the result via resumption tokens. Caution:
+specifying too large a limit will adversely affect performance.
+
+</li>
+</ul>
+<p>
+Mapping from a ActiveRecord object to a specific metadata format follows
+this set of rules:
+</p>
+<ol>
+<li>Does Model#to_{metadata_prefix} exist? If so just return the result.
+
+</li>
+<li>Does the model provide a map via Model.map_{metadata_prefix}? If so use the
+map to generate the xml document.
+
+</li>
+<li>Loop thru the fields of the metadata format and check to see if the model
+responds to either the plural, or singular of the field.
+
+</li>
+</ol>
+<p>
+For maximum control of the xml metadata generated, it&#8216;s usually best
+to provide a &#8216;to_{metadata_prefix}&#8217; in the model. If using
+Builder be sure not to include any instruct! in the xml object.
+</p>
+<h3>Explicit creation example</h3>
+<pre>
+ class Post &lt; ActiveRecord::Base
+   def to_oai_dc
+     xml = Builder::XmlMarkup.new
+     xml.tag!(&quot;oai_dc:dc&quot;,
+       'xmlns:oai_dc' =&gt; &quot;http://www.openarchives.org/OAI/2.0/oai_dc/&quot;,
+       'xmlns:dc' =&gt; &quot;http://purl.org/dc/elements/1.1/&quot;,
+       'xmlns:xsi' =&gt; &quot;http://www.w3.org/2001/XMLSchema-instance&quot;,
+       'xsi:schemaLocation' =&gt;
+         %{http://www.openarchives.org/OAI/2.0/oai_dc/
+           http://www.openarchives.org/OAI/2.0/oai_dc.xsd}) do
+         xml.tag!('oai_dc:title', title)
+         xml.tag!('oai_dc:description', text)
+         xml.tag!('oai_dc:creator', user)
+         tags.each do |tag|
+           xml.tag!('oai_dc:subject', tag)
+         end
+     end
+     xml.target!
+   end
+ end
+</pre>
+<h3>Mapping Example</h3>
+<pre>
+ # Extremely contrived mapping
+ class Post &lt; ActiveRecord::Base
+   def self.map_oai_dc
+     {:subject =&gt; :tags,
+      :description =&gt; :text,
+      :creator =&gt; :user,
+      :contibutor =&gt; :comments}
+   end
+ end
+</pre>
+
+    </div>
+
+
+   </div>
+
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+    <div id="class-list">
+      <h3 class="section-bar">Classes and Modules</h3>
+
+      Module <a href="Provider/Metadata.html" class="link">OAI::Provider::Metadata</a><br />
+Module <a href="Provider/Response.html" class="link">OAI::Provider::Response</a><br />
+Class <a href="Provider/ActiveRecordCachingWrapper.html" class="link">OAI::Provider::ActiveRecordCachingWrapper</a><br />
+Class <a href="Provider/ActiveRecordWrapper.html" class="link">OAI::Provider::ActiveRecordWrapper</a><br />
+Class <a href="Provider/Base.html" class="link">OAI::Provider::Base</a><br />
+Class <a href="Provider/Model.html" class="link">OAI::Provider::Model</a><br />
+Class <a href="Provider/OaiEntry.html" class="link">OAI::Provider::OaiEntry</a><br />
+Class <a href="Provider/OaiToken.html" class="link">OAI::Provider::OaiToken</a><br />
+Class <a href="Provider/PartialResult.html" class="link">OAI::Provider::PartialResult</a><br />
+Class <a href="Provider/ResumptionToken.html" class="link">OAI::Provider::ResumptionToken</a><br />
+
+    </div>
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

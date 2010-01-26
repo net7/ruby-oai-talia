@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>File: README</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href=".././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+  <div id="fileHeader">
+    <h1>README</h1>
+    <table class="header-table">
+    <tr class="top-aligned-row">
+      <td><strong>Path:</strong></td>
+      <td>README
+      </td>
+    </tr>
+    <tr class="top-aligned-row">
+      <td><strong>Last Update:</strong></td>
+      <td>Thu Jul 09 15:18:44 +0200 2009</td>
+    </tr>
+    </table>
+  </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <h1>ruby-oai</h1>
+<h2>DESCRIPTION</h2>
+<p>
+ruby-oai is a Open Archives Protocol for Metadata Harvesting (<a
+href="http://openarchives.org">OAI-PMH</a>) library for Ruby. If
+you&#8216;re not familiar with <a
+href="http://openarchives.org">OAI-PMH</a> it is the most used protocol for
+sharing metadata between digital library repositories.
+</p>
+<p>
+The <a href="http://openarchives.org">OAI-PMH</a> spec defines six verbs
+(Identify, ListIdentifiers, ListRecords, GetRecords, ListSets,
+ListMetadataFormat) used for discovery and sharing of metadata.
+</p>
+<p>
+The ruby-oai gem includes a client library, a server/provider library and a
+interactive harvesting shell.
+</p>
+<h3>client</h3>
+<p>
+The <a href="../classes/OAI.html">OAI</a> client library is used for
+harvesting metadata from repositories. For example to initiate a
+ListRecords request to pubmed you can:
+</p>
+<pre>
+  require 'oai'
+  client = OAI::Client.new 'http://www.pubmedcentral.gov/oai/oai.cgi'
+  for record in client.list_records
+    puts record.metadata
+  end
+</pre>
+<p>
+See <a href="../classes/OAI/Client.html">OAI::Client</a> for more details
+</p>
+<h3>provider</h3>
+<p>
+The <a href="../classes/OAI.html">OAI</a> provider library handles serving
+local content to other clients.
+</p>
+<p>
+Setting up a simple provider:
+</p>
+<pre>
+  class MyProvider &lt; Oai::Provider
+    repository_name 'My little OAI provider'
+    repository_url  'http://localhost/provider'
+    record_prefix 'oai:localhost'
+    admin_email 'root@localhost'   # String or Array
+    source_model MyModel.new       # Subclass of OAI::Provider::Model
+  end
+</pre>
+<p>
+See <a href="../classes/OAI/Provider.html">OAI::Provider</a> for more
+details
+</p>
+<h3>interactive harvester</h3>
+<p>
+The <a href="http://openarchives.org">OAI-PMH</a> client shell allows <a
+href="../classes/OAI.html">OAI</a> Harvesting to be configured in an
+interactive manner. Typing &#8216;oai&#8217; on the command line starts the
+shell.
+</p>
+<p>
+After initial configuration, the shell can be used to manage harvesting
+operations.
+</p>
+<p>
+See <a href="../classes/OAI/Harvester/Shell.html">OAI::Harvester::Shell</a>
+for more details
+</p>
+<h2>INSTALLATION</h2>
+<p>
+Normally the best way to install oai is from rubyforge using the gem
+command line tool:
+</p>
+<pre>
+  % gem install oai
+</pre>
+<p>
+If you&#8216;re reading this you&#8216;ve presumably got the tarball or zip
+distribution. So you&#8216;ll need to:
+</p>
+<pre>
+  % rake package
+  % gem install pkg/oai-x.y.z.gem
+</pre>
+<p>
+Where x.y.z is the version of the gem that was generated.
+</p>
+<h2>TODO</h2>
+<ul>
+<li>consolidate response classes used by provider and client
+
+</li>
+<li>automatic validation of metadata schemas
+
+</li>
+<li>email the authors with your suggestions
+
+</li>
+</ul>
+<h2>AUTHORS</h2>
+<ul>
+<li>Ed Summers &lt;ehs@pobox.com&gt;
+
+</li>
+<li>William Groppe &lt;will.groppe@gmail.com&gt;
+
+</li>
+<li>Terry Reese &lt;terry.reese@oregonstate.edu&gt;
+
+</li>
+</ul>
+
+    </div>
+
+
+   </div>
+
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: OAI::Record</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">OAI::Record</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/lib/oai/client/record_rb.html">
+                lib/oai/client/record.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                Object
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+A class for representing a <a href="Record.html">Record</a> as returned
+from a GetRecord or ListRecords request. Each record will have a header and
+metadata attribute. The header is a <a href="Header.html">OAI::Header</a>
+object and the metadata is a REXML::Element object for that chunk of XML.
+</p>
+<p>
+Note: if your <a href="Client.html">OAI::Client</a> was configured to use
+the &#8216;libxml&#8217; parser metadata will return a XML::Node object
+instead.
+</p>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000108">deleted?</a>&nbsp;&nbsp;
+      <a href="#M000107">new</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+    <div id="includes">
+      <h3 class="section-bar">Included Modules</h3>
+
+      <div id="includes-list">
+        <span class="include-name"><a href="XPath.html">OAI::XPath</a></span>
+      </div>
+    </div>
+
+    <div id="section">
+
+
+
+
+
+    <div id="attribute-list">
+      <h3 class="section-bar">Attributes</h3>
+
+      <div class="name-list">
+        <table>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">header</td>
+          <td class="context-item-value">&nbsp;[RW]&nbsp;</td>
+          <td class="context-item-desc"></td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">metadata</td>
+          <td class="context-item-value">&nbsp;[RW]&nbsp;</td>
+          <td class="context-item-desc"></td>
+        </tr>
+        </table>
+      </div>
+    </div>
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000107" class="method-detail">
+        <a name="M000107"></a>
+
+        <div class="method-heading">
+          <a href="#M000107" class="method-signature">
+          <span class="method-name">new</span><span class="method-args">(element)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000107-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000107-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/oai/client/record.rb, line 15</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">element</span>)
+      <span class="ruby-ivar">@header</span> = <span class="ruby-constant">OAI</span><span class="ruby-operator">::</span><span class="ruby-constant">Header</span>.<span class="ruby-identifier">new</span> <span class="ruby-identifier">xpath_first</span>(<span class="ruby-identifier">element</span>, <span class="ruby-value str">'.//header'</span>)
+      <span class="ruby-ivar">@metadata</span> = <span class="ruby-identifier">xpath_first</span>(<span class="ruby-identifier">element</span>, <span class="ruby-value str">'.//metadata'</span>)
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000108" class="method-detail">
+        <a name="M000108"></a>
+
+        <div class="method-heading">
+          <a href="#M000108" class="method-signature">
+          <span class="method-name">deleted?</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+a convenience method which digs into the header status attribute and
+returns true if the value is set to &#8216;deleted&#8216;
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000108-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000108-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/oai/client/record.rb, line 22</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">deleted?</span>
+      <span class="ruby-keyword kw">return</span> <span class="ruby-ivar">@header</span>.<span class="ruby-identifier">deleted?</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>
