@@ -42,20 +42,20 @@ end
 
 namespace :test do
   Rake::TestTask.new('client') do |t|
-    t.libs << ['lib', 'test/client']
+    t.libs += ['lib', 'test/client']
     t.pattern = 'test/client/tc_*.rb'
     t.verbose = true
   end
 
   Rake::TestTask.new('provider') do |t|
-    t.libs << ['lib', 'test/provider']
+    t.libs += ['lib', 'test/provider']
     t.pattern = 'test/provider/tc_*.rb'
     t.verbose = true
   end
 
   desc "Active Record base Provider Tests"
   Rake::TestTask.new('activerecord_provider') do |t|
-    t.libs << ['lib', 'test/activerecord_provider']
+    t.libs += ['lib', 'test/activerecord_provider']
     t.pattern = 'test/activerecord_provider/tc_*.rb'
     t.verbose = true
   end
@@ -71,6 +71,9 @@ namespace :test do
   end
 
 end
+
+desc "Run all unit tests"
+task :test => ['test:client', 'test:provider', 'test:activerecord_provider']
 
 task 'test:activerecord_provider' => :create_database
 

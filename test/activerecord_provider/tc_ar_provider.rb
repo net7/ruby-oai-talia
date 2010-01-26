@@ -13,7 +13,8 @@ class ActiveRecordProviderTest < Test::Unit::TestCase
   end
   
   def test_metadata_formats_for_record
-    assert_nothing_raised { REXML::Document.new(@provider.list_metadata_formats(:identifier => 'oai:test/1')) }
+    record_id = DCField.find(:first).id
+    assert_nothing_raised { REXML::Document.new(@provider.list_metadata_formats(:identifier => "oai:test/#{record_id}")) }
     doc =  REXML::Document.new(@provider.list_metadata_formats)
     assert doc.elements['/OAI-PMH/ListMetadataFormats/metadataFormat/metadataPrefix'].text == 'oai_dc'
   end
@@ -33,7 +34,7 @@ class ActiveRecordProviderTest < Test::Unit::TestCase
   def test_get_record
     record_id = DCField.find(:first).id
     assert_nothing_raised { REXML::Document.new(@provider.get_record(:identifier => "oai:test/#{record_id}", :metadata_prefix => 'oai_dc')) }
-    doc = REXML::Document.new(@provider.get_record(:identifier => "#{record_id}", metadata_prefix => 'oai_dc'))
+    doc = REXML::Document.new(@provider.get_record(:identifier => "#{record_id}", :metadata_prefix => 'oai_dc'))
     assert_equal "oai:test/#{record_id}", doc.elements['OAI-PMH/GetRecord/record/header/identifier'].text
   end
   
@@ -73,7 +74,7 @@ class ActiveRecordProviderTest < Test::Unit::TestCase
       "id < #{first_id + 10}")
 
     doc = REXML::Document.new(
-      @provider.list_records(:until => Time.parse("June 1 2005"))
+      @provider.list_records(:until => Time.parse("June 1 2005"), :metadata_prefix => 'oai_dc')
       )
     assert_equal 10, doc.elements['OAI-PMH/ListRecords'].to_a.size
   end
