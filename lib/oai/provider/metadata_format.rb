@@ -76,7 +76,7 @@ module OAI::Provider::Metadata
       elsif record.respond_to?(method)
         # at this point, this function will throw a dep. error because of the call to type -- a reserved work
         # in ruby
-        record.send method
+        silence_warnings { record.send method }
       else
         []
       end
@@ -127,6 +127,14 @@ module OAI::Provider::Metadata
         [/(quiz)$/i, '\1zes']
       ]
     end
+    
+    def silence_warnings
+      old_verbose, $VERBOSE = $VERBOSE, nil
+      yield
+    ensure
+      $VERBOSE = old_verbose
+    end
+    
 
   end
   

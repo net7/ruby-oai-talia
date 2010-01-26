@@ -4,7 +4,7 @@ class CachingPagingProviderTest < Test::Unit::TestCase
   include REXML
   
   def test_full_harvest
-    doc = Document.new(@provider.list_records)
+    doc = Document.new(@provider.list_records(:metadata_prefix => 'oai_dc'))
     assert_not_nil doc.elements["/OAI-PMH/ListRecords/resumptionToken"]
     assert_equal 26, doc.elements["/OAI-PMH/ListRecords"].size
     token = doc.elements["/OAI-PMH/ListRecords/resumptionToken"].text
@@ -32,7 +32,8 @@ class CachingPagingProviderTest < Test::Unit::TestCase
     doc = Document.new(
       @provider.list_records(
         :from => Time.parse("September 1 2005"),
-        :until => Time.parse("November 30 2005"))
+        :until => Time.parse("November 30 2005"),
+        :metadata_prefix => 'oai_dc')
       )
     assert_equal 26, doc.elements["/OAI-PMH/ListRecords"].size
     token = doc.elements["/OAI-PMH/ListRecords/resumptionToken"].text

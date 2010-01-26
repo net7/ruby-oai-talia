@@ -217,7 +217,7 @@ module OAI
         else
           raise ArgumentError, "Permanently Redirected to [#{response['location']}]"
         end
-      when Net::HTTPTemporaryRedirect
+      when Net::HTTPTemporaryRedirect, Net::HTTPFound
         response = get(URI.parse(response['location']))
       else
         raise ArgumentError, "#{response.code_type} [#{response.code}]"
