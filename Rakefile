@@ -11,14 +11,18 @@ task :default => ["test"]
 
 task :test => ["test:client", "test:provider"]
 
-spec = Gem::Specification.new do |s|
-    s.name = 'oai'
-    s.version = RUBY_OAI_VERSION
-    s.author = 'Ed Summers'
-    s.email = 'ehs@pobox.com'
-    s.homepage = 'http://www.textualize.com/ruby_oai_0'
+begin
+  require 'jeweler'
+  Jeweler::Tasks.new do |s|
+    s.name = "oai_talia"
+    s.summary = "A ruby library for working with the Open Archive Initiative Protocol for Metadata Harvesting (OAI-PMH)"
+    s.email = "ghub@limitedcreativity.org"
+    s.homepage = "http://trac.talia.discovery-project.eu/"
+    s.description = "A ruby library for working with the Open Archive Initiative Protocol for Metadata Harvesting (OAI-PMH). Fork of the original version by Ed Summers, aims for best standards compatibility (test with http://re.cs.uct.ac.za/)"
+    s.required_ruby_version = '>= 1.8.6'
+    s.authors = ["Ed Summers", "Daniel Hahn"]
+    s.homepage = 'http://github.com/net7/ruby-oai-talia/'
     s.platform = Gem::Platform::RUBY
-    s.summary = 'A ruby library for working with the Open Archive Initiative Protocol for Metadata Harvesting (OAI-PMH)'
     s.require_path = 'lib'
     s.autorequire = 'oai'
     s.has_rdoc = true
@@ -30,12 +34,10 @@ spec = Gem::Specification.new do |s|
     s.files = %w(README Rakefile) +
       Dir.glob("{bin,test,lib}/**/*") + 
       Dir.glob("examples/**/*.rb")
-end
-
-Rake::GemPackageTask.new(spec) do |pkg|
-  pkg.need_zip = true
-  pkg.need_tar = true
-  pkg.gem_spec = spec
+  end
+  Jeweler::GemcutterTasks.new
+rescue LoadError
+  puts "Jeweler (or a dependency) not available. Install it with: gem install jeweler"
 end
 
 namespace :test do
@@ -108,4 +110,15 @@ Rake::RDocTask.new('doc') do |rd|
   rd.rdoc_files.include("lib/**/*.rb", "README")
   rd.main = 'README'
   rd.rdoc_dir = 'doc'
+end
+
+begin
+  require 'gokdok'
+  Gokdok::Dokker.new do |gd|
+    gd.remote_path = ''
+    gd.rdoc_task = :doc
+    gd.doc_home = 'doc'
+  end
+rescue LoadError
+  puts "Gokdoc not available. Install it with: gem install gokdok"
 end
