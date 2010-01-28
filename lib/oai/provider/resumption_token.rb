@@ -25,9 +25,9 @@ module OAI::Provider
           when /^s/
             options[:set] = part.sub(/^s\(/, '').sub(/\)$/, '')
           when /^f/
-            options[:from] = Time.parse(part.sub(/^f\(/, '').sub(/\)$/, '')).localtime
+            options[:from] = Time.parse(part.sub(/^f\(/, '').sub(/\)$/, ''))
           when /^u/
-            options[:until] = Time.parse(part.sub(/^u\(/, '').sub(/\)$/, '')).localtime
+            options[:until] = Time.parse(part.sub(/^u\(/, '').sub(/\)$/, ''))
           end
         end
         self.new(options)
