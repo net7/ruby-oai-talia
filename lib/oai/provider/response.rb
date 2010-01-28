@@ -142,7 +142,7 @@ module OAI
           def internalize(hash = {})
             internal = {}
             hash.keys.each do |key|
-              internal[key.to_s.gsub(/([A-Z])/, '_\1').downcase.intern] = hash[key].dup
+              internal[key.to_s.gsub(/([A-Z])/, '_\1').downcase.intern] = hash[key].nil? ? nil : hash[key].dup
             end
 
             # Convert date formated strings into internal time values

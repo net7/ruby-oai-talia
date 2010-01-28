@@ -5,17 +5,24 @@ class ResumptionTokenTest < Test::Unit::TestCase
   include OAI::Provider
   
   def setup
-    @token = ResumptionToken.new(
+    @token = ResumptionToken.new(2, {
       :from => Time.utc(2005,"jan",1,17,0,0),
       :until => Time.utc(2005,"jan",31,17,0,0),
       :set => "A",
       :metadata_prefix => "oai_dc", 
-      :last => 1
+      :last => 1 }
+    )
+    @last_token = ResumptionToken.new(1, {
+      :from => Time.utc(2005,"jan",1,17,0,0),
+      :until => Time.utc(2005,"jan",31,17,0,0),
+      :set => "A",
+      :metadata_prefix => "oai_dc", 
+      :last => 1 }
     )
   end
 
   def test_resumption_token_options_encoding
-    assert_equal "oai_dc.s(A).f(2005-01-01T17:00:00Z).u(2005-01-31T17:00:00Z)",
+    assert_equal "oai_dc.s(A).f(2005-01-01T17:00:00Z).u(2005-01-31T17:00:00Z).l(2)",
       @token.to_s
   end
   
@@ -33,7 +40,7 @@ class ResumptionTokenTest < Test::Unit::TestCase
 
   def test_resumption_token_parsing
     new_token = ResumptionToken.parse(
-      "oai_dc.s(A).f(2005-01-01T17:00:00Z).u(2005-01-31T17:00:00Z):1"
+      "oai_dc.s(A).f(2005-01-01T17:00:00Z).u(2005-01-31T17:00:00Z).l(2):1"
     )
     assert_equal @token, new_token
   end
@@ -42,5 +49,11 @@ class ResumptionTokenTest < Test::Unit::TestCase
     doc = REXML::Document.new(@token.to_xml)
     assert_equal "#{@token.to_s}:#{@token.last}", doc.elements['/resumptionToken'].text
   end
+    
+  def test_last_resumption_token_to_xml
+    doc = REXML::Document.new(@last_token.to_xml)
+    assert_not_nil doc.elements['/resumptionToken']
+    assert_nil doc.elements['/resumptionToken'].text
+  end  
     
 end

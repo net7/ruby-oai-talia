@@ -45,6 +45,11 @@ module OAI::Provider
       raise NotImplementedError.new
     end
     
+    # Should return the last id of this model
+    def last_id(conditions)
+      raise NotImplementedError.new
+    end
+    
     def sets
       nil
     end

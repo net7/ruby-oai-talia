@@ -34,10 +34,11 @@ class ResumptionTokenFunctionalTest < Test::Unit::TestCase
     assert_not_nil doc.elements["/OAI-PMH/ListRecords/resumptionToken"]
     assert_equal 101, doc.elements["/OAI-PMH/ListRecords"].to_a.size
     token = doc.elements["/OAI-PMH/ListRecords/resumptionToken"].text
-
+    
     doc = Document.new(@provider.list_records(:resumption_token => token))
-    assert_nil doc.elements["/OAI-PMH/ListRecords/resumptionToken"]
-    assert_equal 100, doc.elements["/OAI-PMH/ListRecords"].to_a.size
+    assert_not_nil doc.elements["/OAI-PMH/ListRecords/resumptionToken"]
+    assert_nil doc.elements["/OAI-PMH/ListRecords/resumptionToken"].text
+    assert_equal 101, doc.elements["/OAI-PMH/ListRecords"].to_a.size
   end
     
 end

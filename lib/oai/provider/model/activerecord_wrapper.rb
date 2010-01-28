@@ -34,6 +34,12 @@ module OAI::Provider
       model.find(:first, 
         :order => "#{timestamp_field} desc").send(timestamp_field)
     end
+    
+    def last_id(conditions)
+      model.find(:first, :conditions => conditions,
+        :order => "#{timestamp_field} desc").id
+    end
+    
     # A model class is expected to provide a method Model.sets that
     # returns all the sets the model supports.  See the 
     # activerecord_provider tests for an example.   
@@ -46,8 +52,8 @@ module OAI::Provider
       conditions = sql_conditions(options)
       if :all == selector
         total = model.count(:id, :conditions => conditions)
-        if @limit && total > @limit
-          select_partial(ResumptionToken.new(options.merge({:last => 0})))
+        if(@limit && total > @limit)
+          select_partial(ResumptionToken.new(last_id(conditions), options.merge({:last => 0}), nil, total))
         else
           model.find(:all, :conditions => conditions)
         end
@@ -78,13 +84,7 @@ module OAI::Provider
       token = ResumptionToken.parse(token_string)
       total = model.count(:id, :conditions => token_conditions(token))
     
-      if @limit < total
-        select_partial(token)
-      else # end of result set
-        model.find(:all, 
-          :conditions => token_conditions(token), 
-          :limit => @limit, :order => "#{model.primary_key} asc")
-      end
+      select_partial(token)
     end
     
     # select a subset of the result set, and return it with a
@@ -96,7 +96,6 @@ module OAI::Provider
         :order => "#{model.primary_key} asc")
       raise OAI::ResumptionTokenException.new unless records
       offset = records.last.send(model.primary_key.to_sym)
-      
       PartialResult.new(records, token.next(offset))
     end
     
@@ -121,17 +120,29 @@ module OAI::Provider
     # build a sql conditions statement from an OAI options hash
     def sql_conditions(opts)
       sql = []
-      sql << "#{timestamp_field} >= ?" << "#{timestamp_field} <= ?" 
-      sql << "set = ?" if opts[:set]
-      esc_values = [sql.join(" AND ")]
-      esc_values << get_time(opts[:from]).localtime << get_time(opts[:until]).localtime #-- OAI 2.0 hack - UTC fix from record_responce 
-      esc_values << opts[:set] if opts[:set]
+      values = []
       
-      return esc_values
+      if(opts[:set])
+        sql << "set = ?"
+        values << opts[:set]
+      end
+      
+      if(opts[:from])
+        sql << "#{timestamp_field} >= ?"
+        values << get_time(opts[:from])
+      end
+      
+      if(opts[:until])
+        sql << "#{timestamp_field} <= ?"
+        values << get_time(opts[:until])
+      end
+      
+      values.unshift(sql.join(' AND '))
     end
     
+    #-- OAI 2.0 hack - UTC fix from record_responce 
     def get_time(time)
-      time.kind_of?(Time) ? time : Time.parse(time)
+      (time.kind_of?(Time) ? time : Time.parse(time)).localtime
     end
     
   end

@@ -9,7 +9,8 @@ module OAI::Provider
   # provides several helper methods for dealing with resumption tokens.
   #
   class ResumptionToken
-    attr_reader :prefix, :set, :from, :until, :last, :expiration, :total
+    attr_reader :prefix, :set, :from, :until, :last, :expiration, :last_id
+    attr_accessor :total
 
     # parses a token string and returns a ResumptionToken
     def self.parse(token_string)
@@ -17,6 +18,8 @@ module OAI::Provider
         options = {}
         matches = /(.+):(\d+)$/.match(token_string)
         options[:last] = matches.captures[1].to_i
+        last_id = nil
+        total = nil
         
         parts = matches.captures[0].split('.')
         options[:metadata_prefix] = parts.shift
@@ -28,9 +31,13 @@ module OAI::Provider
             options[:from] = Time.parse(part.sub(/^f\(/, '').sub(/\)$/, ''))
           when /^u/
             options[:until] = Time.parse(part.sub(/^u\(/, '').sub(/\)$/, ''))
+          when /^l/
+            last_id = part.sub(/^l\(/, '').sub(/\)$/, '')
+          when /^t/
+            total = part.sub(/^t\(/, '').sub(/\)$/, '')
           end
         end
-        self.new(options)
+        self.new(last_id, options, nil, total)
       rescue => err
         raise ResumptionTokenException.new
       end
@@ -41,7 +48,7 @@ module OAI::Provider
       return token_string.split('.')[0]
     end
 
-    def initialize(options, expiration = nil, total = nil)
+    def initialize(last_id, options, expiration = nil, total = nil)
       @prefix = options[:metadata_prefix]
       @set = options[:set]
       @last = options[:last]
@@ -49,6 +56,7 @@ module OAI::Provider
       @until = options[:until] if options[:until]
       @expiration = expiration if expiration
       @total = total if total
+      @last_id = last_id
     end
           
     # convenience method for setting the offset of the next set of results
@@ -66,7 +74,13 @@ module OAI::Provider
     # output an xml resumption token
     def to_xml
       xml = Builder::XmlMarkup.new
-      xml.resumptionToken(encode_conditions, hash_of_attributes)
+      token_content = if(last_id.to_s == last.to_s)
+        [] # Empty token required on last page of results
+      else
+        [encode_conditions, hash_of_attributes]
+      end
+      
+      xml.resumptionToken(*token_content)
       xml.target!
     end
     
@@ -91,6 +105,8 @@ module OAI::Provider
       encoded_token << ".s(#{set})" if set
       encoded_token << ".f(#{self.from.utc.xmlschema})" if self.from
       encoded_token << ".u(#{self.until.utc.xmlschema})" if self.until
+      encoded_token << ".t(#{self.total})" if(self.total)
+      encoded_token << ".l(#{last_id})"
       encoded_token << ":#{last}"
     end
 

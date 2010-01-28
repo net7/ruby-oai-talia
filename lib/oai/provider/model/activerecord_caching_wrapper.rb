@@ -65,7 +65,7 @@ module OAI::Provider
         total = model.count(:id, :conditions => conditions)
         if @limit && total > @limit
           select_partial(
-            ResumptionToken.new(options.merge({:last => 0})))
+            ResumptionToken.new(last_id(conditions), options.merge({:last => 0}), nil, total))
         else
           model.find(:all, :conditions => conditions)
         end

@@ -64,12 +64,9 @@ class TestModel < OAI::Provider::Model
         raise OAI::ResumptionTokenException.new unless @limit
         begin
           token = ResumptionToken.parse(opts[:resumption_token])
+          token.total = @groups.size
 
-          if token.last < @groups.size - 1
-            PartialResult.new(@groups[token.last], token.next(token.last + 1))
-          else
-            @groups[token.last]
-          end
+          PartialResult.new(@groups[token.last], token.next(token.last + 1))
         rescue
           raise OAI::ResumptionTokenException.new
         end
@@ -88,7 +85,7 @@ class TestModel < OAI::Provider::Model
         if @limit && records.size > @limit
           @groups = generate_chunks(records, @limit)
           return PartialResult.new(@groups[0], 
-            ResumptionToken.new(opts.merge({:last => 1})))
+            ResumptionToken.new(@groups.size, opts.merge({:last => 1}), nil, records.size))
         end
         return records
       end
