@@ -15,6 +15,7 @@ module OAI::Provider::Response
       
         # Remove any format that this particular record can't be provided in.
         formats.reject! { |f| !record_supports(record, f.prefix) }
+        raise OAI::MetadataFormatException if formats.size == 0
       end
       response do |r|
         r.ListMetadataFormats do

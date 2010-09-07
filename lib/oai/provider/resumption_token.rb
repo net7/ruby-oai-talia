@@ -39,7 +39,7 @@ module OAI::Provider
         end
         self.new(last_id, options, nil, total)
       rescue => err
-        raise ResumptionTokenException.new
+        raise OAI::ResumptionTokenException.new
       end
     end
     
